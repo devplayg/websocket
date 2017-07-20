@@ -1,0 +1,22 @@
+{{template "base.html" .}}
+
+{{define "contents"}}
+<form id="chat">
+    <textarea cols="80" rows="25" style="width:600px"></textarea>
+    <br>
+    <input type="text" name="message" style="width:600px" />
+    <input type="button" class="btn-send" value="Send" />
+</form>
+{{end}}
+
+
+
+{{ define "javascript" }}
+<script>
+var conn = new WebSocket("ws://" + document.location.host + "/ws");
+$(".btn-send").onClick( function(e) {
+    console.log(3) ;
+});
+</script>
+{{end}}
+

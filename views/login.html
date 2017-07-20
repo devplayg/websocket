@@ -1,0 +1,10 @@
+{{template "base.html" .}}
+
+{{define "contents"}}
+<form method="post" action="/join">
+{{.username}}
+    <input type="text" name="username" value="won">
+    <input type="submit" value="Login">
+</form>
+{{end}}
+
