@@ -14,6 +14,29 @@ func (this *WebsocketController) Join() {
 }
 
 func (this *WebsocketController) OpenSocket() {
+
+	// Upgrade from http request to WebSocket.
+	ws, err := websocket.Upgrade(this.Ctx.ResponseWriter, this.Ctx.Request, nil, 1024, 1024)
+	if _, ok := err.(websocket.HandshakeError); ok {
+		http.Error(this.Ctx.ResponseWriter, "Not a websocket handshake", 400)
+		return
+	} else if err != nil {
+		beego.Error("Cannot setup WebSocket connection:", err)
+		return
+	}
+
+	// Join chat room.
+	Join(uname, ws)
+	defer Leave(uname)
+
+	// Message receive loop.
+	for {
+		_, p, err := ws.ReadMessage()
+		if err != nil {
+			return
+		}
+		publish <- newEvent(models.EVENT_MESSAGE, uname, string(p))
+	}
 }
 
 func init() {
@@ -50,4 +73,19 @@ func (h *Hub) run() {
 		}
 		beego.Info("wait")
 	}
+}
+
+func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client.hub.register <- client
+
+	// Allow collection of memory referenced by the caller by doing all work in
+	// new goroutines.
+	go client.writePump()
+	go client.readPump()
 }
