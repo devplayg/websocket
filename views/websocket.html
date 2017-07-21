@@ -1,0 +1,77 @@
+{{template "base.html" .}}
+
+{{define "contents"}}
+
+<form id="form-chat">
+    <table border="1" cellpadding="5" width="100%">
+    <tr>
+        <td valign="top" width="30%">
+            Username: <input type="text" name="username" value="won" /><br/>
+            <input type="button" class="btn-connect" value="Connect" />
+            <input type="button" class="btn-disconnect" value="Disconnect" />
+        </td>
+        <td valign="top">
+            <input type="text" name="message" class="chat" value="" size="80" disabled />
+            <input type="submit" class="btn-send chat" value="Send" disabled />
+            <br><br>
+            <div id="chat" class="chat" style="border: 1px dashed #acacac;"></div>
+        </td>
+    </tr>
+</form>
+{{end}}
+
+
+
+{{ define "js" }}
+<script>
+$(function() {
+    var socket = null;
+
+    $(".btn-connect").click(function(e) {
+        if (socket) {
+            socket.close();
+        }
+        socket = new WebSocket("ws://" + document.location.host + "/ws");
+        setCookie("username", $( "#form-chat input[name=username]" ).val() );
+        if (socket) {
+                socket.onclose = function (e) {
+                $("#chat").append("closed").append("<br/>");
+            };
+            socket.onmessage = function (e) {
+                var messages = e.data.split('\n');
+                for (var i = 0; i < messages.length; i++) {
+                    $("#chat").append(messages[i]).append("<br/>");
+                }
+            };
+            $(".chat").prop("disabled", false);
+            $( "#form-chat input[name=message]" ).focus();
+        } else {
+            $(".chat").prop("disabled", true);
+        }
+
+    });
+
+    $("#form-chat").submit(function(e) {
+        e.preventDefault();
+        socket.send($( "#form-chat input[name=message]" ).val());
+        $( "#form-chat input[name=message]" ).val("");
+
+    });
+
+    $(".btn-disconnect").click(function(e) {
+        if (!socket) {
+            return false;
+        }
+        socket.close();
+    });
+
+});
+
+function setCookie(cName, cValue) {
+    var cookies = cName + '=' + escape(cValue) + '; path=/ ';
+    document.cookie = cookies;
+}
+</script>
+{{end}}
+
+

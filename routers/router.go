@@ -6,7 +6,6 @@ import (
 )
 
 func init() {
-	beego.Router("/", &controllers.LoginController{})
-	beego.Router("/join", &controllers.WebsocketController{}, "post:Join")
+	beego.Router("/", &controllers.WebsocketController{})
 	beego.Router("/ws", &controllers.WebsocketController{}, "get:OpenSocket")
 }
