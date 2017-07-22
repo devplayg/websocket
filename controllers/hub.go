@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
+
 	"github.com/astaxie/beego"
 )
 
@@ -28,10 +30,12 @@ func (h *Hub) run() {
 		case client := <-h.register:
 			beego.Info("Registered: " + client.name)
 			h.clients[client] = true
+			event := Event{Sender: "server", Message: client.name + " has joined at the chat"}
+			msg, _ := json.Marshal(event)
 			//			client.hub.broadcast <- []byte(client.name + " has joined at the chat")
 			for client := range h.clients {
 				select {
-				case client.send <- []byte(client.name + " has joined at the chat"):
+				case client.send <- msg:
 				default:
 					close(client.send)
 					delete(h.clients, client)
