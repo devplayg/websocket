@@ -50,8 +50,8 @@ type Client struct {
 }
 
 type Event struct {
-	Sender  string
-	Message string
+	Sender  string `json:"sender"`
+	Message string `json:"message"`
 }
 
 func (c *Client) readPump() {
