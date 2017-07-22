@@ -3,20 +3,31 @@
 {{define "contents"}}
 
 <form id="form-chat">
-    <table border="1" cellpadding="5" width="100%">
-    <tr>
-        <td valign="top" width="30%">
-            Username: <input type="text" name="username" value="won" /><br/>
-            <input type="button" class="btn-connect" value="Connect" />
-            <input type="button" class="btn-disconnect" value="Disconnect" />
-        </td>
-        <td valign="top">
-            <input type="text" name="message" class="chat" value="" size="80" disabled />
-            <input type="submit" class="btn-send chat" value="Send" disabled />
-            <br><br>
-            <div id="chat" class="chat" style="border: 1px dashed #acacac;"></div>
-        </td>
-    </tr>
+    <div class="row">
+        <div class="col-xs-3">
+            <input type="text" class="form-control" name="username" value="won" placeholder="Username" />
+            <div class="mt5">
+                <button type="button" class="btn btn-primary btn-connect">Connect</button>
+                <button type="button" class="btn btn-danger btn-disconnect">Disconnect</button>
+            </div>
+        </div>
+        <div class="col-xs-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div id="chat" style="height:300px; overflow-y: scroll;"></div>
+
+                    <div class="row mt5">
+                        <div class="col-xs-10">
+                            <input type="text" name="message" class="form-control chat" disabled />
+                        </div>
+                        <div class="col-xs-2">
+                            <button type="submit" class="btn btn-primary btn-block btn-send chat" disabled>Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
 {{end}}
 
@@ -25,52 +36,64 @@
 {{ define "js" }}
 <script>
 $(function() {
-    var socket = null;
+var socket = null;
 
-    $(".btn-connect").click(function(e) {
-        if (socket) {
-            socket.close();
-        }
-        socket = new WebSocket("ws://" + document.location.host + "/ws");
-        setCookie("username", $( "#form-chat input[name=username]" ).val() );
-        if (socket) {
-                socket.onclose = function (e) {
-                $("#chat").append("closed").append("<br/>");
-            };
-            socket.onmessage = function (e) {
-                var messages = e.data.split('\n');
-                for (var i = 0; i < messages.length; i++) {
-                    $("#chat").append(messages[i]).append("<br/>");
-                }
-            };
-            $(".chat").prop("disabled", false);
-            $( "#form-chat input[name=message]" ).focus();
-        } else {
-            $(".chat").prop("disabled", true);
-        }
-
-    });
-
-    $("#form-chat").submit(function(e) {
-        e.preventDefault();
-        socket.send($( "#form-chat input[name=message]" ).val());
-        $( "#form-chat input[name=message]" ).val("");
-
-    });
-
-    $(".btn-disconnect").click(function(e) {
-        if (!socket) {
-            return false;
-        }
+$(".btn-connect").click(function(e) {
+    if (socket) {
         socket.close();
-    });
+    }
+    var username = $.trim( $( "#form-chat input[name=username]" ).val() );
+    if ( username.length < 1 ) {
+        return;
+    }
+
+    // Connect to server
+    socket = new WebSocket("ws://" + document.location.host + "/ws?username=" + username);
+    if ( socket ) {
+        socket.onclose = function(e) {
+            $("#chat").append("closed").append("<br/>");
+        };
+        socket.onmessage = function(e) {
+            console.log(e.data);
+            var messages = e.data.split('\n');
+            for (var i = 0; i < messages.length; i++) {
+                $("#chat").append(messages[i]).append("<br/>");
+            }
+        };
+        $(".chat").prop("disabled", false);
+        $( "#form-chat input[name=message]" ).focus();
+    } else {
+        $(".chat").prop("disabled", true);
+    }
 
 });
 
-function setCookie(cName, cValue) {
-    var cookies = cName + '=' + escape(cValue) + '; path=/ ';
-    document.cookie = cookies;
+$("#form-chat").submit(function(e) {
+    e.preventDefault();
+    send();
+});
+
+$(".btn-disconnect").click(function(e) {
+    if (!socket) {
+        return false;
+    }
+    socket.close();
+});
+
+function send() {
+    var event = {
+        message: $.trim( $( "#form-chat input[name=message]" ).val() )
+    }
+    socket.send( JSON.stringify( event ) );
+    $( "#form-chat input[name=message]" ).val("");
 }
+
+
+
+
+
+});
+
 </script>
 {{end}}
 

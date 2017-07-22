@@ -2,9 +2,13 @@ package controllers
 
 import (
 	"bytes"
+	"encoding/json"
+	//	"fmt"
 	"time"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/websocket"
 )
 
@@ -45,9 +49,13 @@ type Client struct {
 	name string
 }
 
+type Event struct {
+	Sender  string
+	Message string
+}
+
 func (c *Client) readPump() {
 	defer func() {
-
 		c.hub.unregister <- c
 		c.conn.Close()
 	}()
@@ -58,12 +66,21 @@ func (c *Client) readPump() {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
-				beego.Error(err)
+				logs.Error(err)
 			}
 			break
 		}
+		event := Event{}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message
+		if err := json.Unmarshal(message, &event); err != nil {
+			beego.Error(err)
+			continue
+		}
+		event.Sender = c.name
+		m, _ := json.Marshal(event)
+
+		spew.Dump(event)
+		c.hub.broadcast <- m
 	}
 }
 

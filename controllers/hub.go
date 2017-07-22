@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 )
 
 var hub *Hub
@@ -27,8 +26,17 @@ func (h *Hub) run() {
 	for {
 		select {
 		case client := <-h.register:
-			logs.Info("Registered: " + client.name)
+			beego.Info("Registered: " + client.name)
 			h.clients[client] = true
+			//			client.hub.broadcast <- []byte(client.name + " has joined at the chat")
+			for client := range h.clients {
+				select {
+				case client.send <- []byte(client.name + " has joined at the chat"):
+				default:
+					close(client.send)
+					delete(h.clients, client)
+				}
+			}
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
@@ -49,6 +57,9 @@ func (h *Hub) run() {
 }
 
 func init() {
+	beego.BConfig.WebConfig.Session.SessionOn = true
+	beego.BConfig.AppName = "websocket"
+
 	beego.Info("Starting websocket..")
 	hub = newHub()
 	go hub.run()

@@ -8,23 +8,22 @@ type WebsocketController struct {
 	beego.Controller
 }
 
-func (this *WebsocketController) Get() {
+func (this *WebsocketController) Signin() {
 	this.Data["httpport"] = beego.AppConfig.String("httpport")
 	this.TplName = "websocket.html"
 }
 
 func (this *WebsocketController) OpenSocket() {
 	conn, err := upgrader.Upgrade(this.Ctx.ResponseWriter, this.Ctx.Request, nil)
-	username := this.Ctx.GetCookie("username")
-	beego.Info("### Username:" + username)
-
 	if err != nil {
 		beego.Error(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, name: username, send: make(chan []byte, 256)}
+	client := &Client{hub: hub, conn: conn, name: this.GetString("username"), send: make(chan []byte, 256)}
+	this.SetSession("username", this.GetString("username"))
 	client.hub.register <- client
 	go client.writePump()
 	go client.readPump()
+	beego.Info("Registered: " + this.GetString("username"))
 	this.ServeJSON()
 }
