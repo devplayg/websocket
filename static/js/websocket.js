@@ -1,5 +1,4 @@
 $(function() {
-
 var sock = (function(form) {
     var socket = null;
         var count = 0;
@@ -33,6 +32,8 @@ var sock = (function(form) {
                 $( "input[name=message]", $(form) ).focus();
             };
             socket.onmessage = function( e ) {
+                var c = Cookies.get("wsid");
+                console.log(Cookies.get());
                 console.log(e.data);
                 var event = JSON.parse( e.data );
                 addMessage( event );
@@ -109,6 +110,7 @@ $( ".on-chat" ).prop( "disabled", true );
 //$( ".on-chat" ).prop( "disabled", true );
 
 var ws = sock( "#form-chat" );
+console.log(ws.isConnected());
 $( ".btn-connect" ).click(function( e ) {
     ws.connect();
 });
@@ -125,8 +127,8 @@ $( ".btn-count" ).click(function( e ) {
 });
 $( ".btn-send-test" ).click(function( e ) {
 
-    for (var i=0; i<3; i++) {
-        ws.send("test");
+    for (var i=0; i<100; i++) {
+        ws.send(i + " = " + Math.random().toString(36).substring(7));
 //        ws.send("test");
     }
 });

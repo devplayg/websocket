@@ -47,11 +47,14 @@ type Client struct {
 	send chan []byte
 
 	name string
+
+	sessionId string
 }
 
 type Event struct {
-	Sender  string `json:"sender"`
-	Message string `json:"message"`
+	Sender    string `json:"sender"`
+	Message   string `json:"message"`
+	SessionId string `json:"sessionId"`
 }
 
 func (c *Client) readPump() {
@@ -77,6 +80,8 @@ func (c *Client) readPump() {
 			continue
 		}
 		event.Sender = c.name
+		event.SessionId = c.sessionId
+
 		spew.Dump(event)
 		m, _ := json.Marshal(event)
 

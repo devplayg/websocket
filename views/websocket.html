@@ -5,7 +5,7 @@
 <form id="form-chat">
     <div class="row">
         <div class="col-xs-2">
-            <input type="text" class="form-control on-chat-reverse" name="username" value="won" placeholder="Username" />
+            <input type="text" class="form-control on-chat-reverse" name="username" value="{{.username}}" placeholder="Username" />
             <div class="mt5">
                 <button type="submit" class="btn btn-primary btn-block btn-send on-chat hidden">Send</button>
                 <button type="button" class="btn btn-primary btn-connect">Connect</button>
@@ -29,5 +29,8 @@
 {{end}}
 
 {{ define "js" }}
+<script>
+    var username = {{.username}};
+</script>
 <script src="/static/js/websocket.js"></script>
 {{end}}

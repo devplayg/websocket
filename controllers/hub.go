@@ -62,6 +62,7 @@ func (h *Hub) run() {
 
 func init() {
 	beego.BConfig.WebConfig.Session.SessionOn = true
+	beego.BConfig.WebConfig.Session.SessionName = "wssessionid"
 	beego.BConfig.AppName = "websocket"
 
 	beego.Info("Starting websocket..")
