@@ -29,80 +29,14 @@
         </div>
     </div>
 </form>
+<footer class="footer">
+  <div class="container">
+    <p class="text-muted">Place sticky footer content here.</p>
+  </div>
+</footer>
+
 {{end}}
 
 {{ define "js" }}
 <script src="/static/js/websocket.js"></script>
 {{end}}
-
-{{ define "jszzz" }}
-<script>
-$(function() {
-var socket = null;
-
-$(".btn-connect").click(function(e) {
-    if (socket) {
-        socket.close();
-    }
-    var username = $.trim( $( "#form-chat input[name=Username]" ).val() );
-    if ( username.length < 1 ) {
-        return;
-    }
-
-    // Connect to server
-    socket = new WebSocket("ws://" + document.location.host + "/ws?Username=" + username);
-    if ( socket ) {
-        socket.onclose = function( e ) {
-            //send( "closed" );
-            $("#chat").append("C").append("<br/>");
-        };
-        socket.onmessage = function( e ) {
-            //console.log(e.data);
-            var event = JSON.parse( e.data );
-            console.log(event);
-            //var messages = e.data.split('\n');
-//            for (var i = 0; i < messages.length; i++) {
-                var $p = $( "<p/>" ).text( event.Message );
-                $("#chat").append($p);
-                //console.log(event.Message);
-                //$("#chat").append(messages[i]).append("<br/>");
-            //}
-        };
-        $(".chat").prop("disabled", false);
-        $( "#form-chat input[name=message]" ).focus();
-    } else {
-        $(".chat").prop("disabled", true);
-    }
-
-});
-
-$("#form-chat").submit(function(e) {
-    e.preventDefault();
-    send( $( "#form-chat input[name=message]" ).val() );
-});
-
-$(".btn-disconnect").click(function(e) {
-    if (!socket) {
-        return false;
-    }
-    socket.close();
-});
-
-var send = function( message ) {
-    var event = {
-        message: message
-    }
-    socket.send( JSON.stringify( event ) );
-    $( "#form-chat input[name=message]" ).val("");
-}
-
-
-
-
-
-});
-
-</script>
-{{end}}
-
-
