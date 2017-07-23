@@ -4,36 +4,27 @@
 
 <form id="form-chat">
     <div class="row">
-        <div class="col-xs-3">
+        <div class="col-xs-2">
             <input type="text" class="form-control on-chat-reverse" name="username" value="won" placeholder="Username" />
             <div class="mt5">
+                <button type="submit" class="btn btn-primary btn-block btn-send on-chat hidden">Send</button>
                 <button type="button" class="btn btn-primary btn-connect">Connect</button>
-                <button type="button" class="btn btn-danger btn-disconnect">Disconnect</button>
+                <button type="button" class="btn btn-danger btn-disconnect on-chat-reverse">Disconnect</button>
+                <button type="button" class="btn btn-success btn-count">Count</button>
+                <button type="button" class="btn btn-success btn-send-test on-chat">Send test message</button>
             </div>
         </div>
-        <div class="col-xs-9">
+        <div class="col-xs-10">
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div id="chatroom" class="chatroom" style="height:300px; overflow-y: scroll;"></div>
-
-                    <div class="row mt5">
-                        <div class="col-xs-10">
-                            <input type="text" name="message" class="form-control on-chat" disabled />
-                        </div>
-                        <div class="col-xs-2">
-                            <button type="submit" class="btn btn-primary btn-block btn-send on-chat" disabled>Send</button>
-                        </div>
-                    </div>
                 </div>
             </div>
+            <input type="text" name="message" class="form-control on-chat" />
         </div>
     </div>
-</form>
-<footer class="footer">
-  <div class="container">
-    <p class="text-muted">Place sticky footer content here.</p>
-  </div>
-</footer>
+
+    </form>
 
 {{end}}
 

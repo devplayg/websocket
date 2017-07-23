@@ -8,6 +8,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/websocket"
 )
 
@@ -76,6 +77,7 @@ func (c *Client) readPump() {
 			continue
 		}
 		event.Sender = c.name
+		spew.Dump(event)
 		m, _ := json.Marshal(event)
 
 		c.hub.broadcast <- m
