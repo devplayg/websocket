@@ -1,11 +1,10 @@
 package main
 
 import (
-	_ "github.com/iwondory/websocket/routers"
 	"github.com/astaxie/beego"
+	_ "github.com/devplayg/websocket/routers"
 )
 
 func main() {
 	beego.Run()
 }
-

@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/iwondory/websocket/controllers"
+	"github.com/devplayg/websocket/controllers"
 )
 
 func init() {
